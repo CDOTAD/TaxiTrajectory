@@ -45,5 +45,7 @@ PostGIS中的点，线，面的表达都要用这个EWKT，其中：
 
 还可以通过ST_GeometryFromText,当然如果你想写 ST_GeomFromEWKB 那我也不拦着你。另外，这个SRID=4236一定要连在一起，**不能有空格**，否则报错！
 
+这是一个VSCODE更新实验
+
 
 
