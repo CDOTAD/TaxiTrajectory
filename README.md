@@ -45,7 +45,38 @@ PostGIS中的点，线，面的表达都要用这个EWKT，其中：
 
 还可以通过ST_GeometryFromText,当然如果你想写 ST_GeomFromEWKB 那我也不拦着你。另外，这个SRID=4236一定要连在一起，**不能有空格**，否则报错！
 
-这是一个VSCODE更新实验
+<li>空间图形做交集</li>
 
+PostGIS功能还是挺强大的，内置各种函数对空间数据进行操作。
+
+[PostGIS常用函数简介](https://blog.csdn.net/xlxxcc/article/details/65629541 "PostGIS常用函数简介")
+
+讲轨迹按照行政区域，栅格区域进行切割
+
+	ST_Intersection(tra.trajectory, polygon.the_geom)
+
+这个取交集好像对点的数量有一定限制，如果点太多，就会没有返回结果。
+具体参见官方文档[ST_Intersection](http://postgis.net/docs/manual-2.4/ST_Intersection.html "ST_Intersection")
+
+栅格切割后的非直线系数
+
+![nonlinearcoe_raster](https://i.imgur.com/KB1uYht.png)
+
+##PGRouting
+
+作为路网分析的工具包，我认为它不太好用，反正我是没查询出来结果sad！[Pgrouting 官网](http://pgrouting.org/ "pgrouting")
+
+主要运用Dijkstra算法计算路网中两点间的最短路径。
+
+[Dijkstra算法家族](http://docs.pgrouting.org/2.5/en/pgr_dijkstra.html#pgr-dijkstra "Dijkstra")
+
+	SELECT * FROM pgr_Dijkstra('
+		SELECT id, source, target, cost, reverse_cost FROM edge_table',
+		2,3
+	);
+
+[简单实例的简单数据集](http://docs.pgrouting.org/2.5/en/sampledata.html "sampledata")
+
+数据很简单，算法在实例数据集上运行结果正确，然而应用到我从openstreetmap上下载下来的数据集后就没有结果。
 
 
