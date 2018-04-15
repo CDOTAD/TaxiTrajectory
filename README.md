@@ -62,7 +62,7 @@ PostGIS功能还是挺强大的，内置各种函数对空间数据进行操作�
 
 ![nonlinearcoe_raster](https://i.imgur.com/KB1uYht.png)
 
-##PGRouting
+## PGRouting
 
 作为路网分析的工具包，我认为它不太好用，反正我是没查询出来结果sad！[Pgrouting 官网](http://pgrouting.org/ "pgrouting")
 
@@ -79,4 +79,11 @@ PostGIS功能还是挺强大的，内置各种函数对空间数据进行操作�
 
 数据很简单，算法在实例数据集上运行结果正确，然而应用到我从openstreetmap上下载下来的数据集后就没有结果。
 
+## Kalman Filtering
+
+- [filterpy 1.2.3](https://github.com/rlabbe/filterpy "filterpy")
+
+滤波前的轨迹，存在漂移记录点
+
+![drifting_tra](https://i.imgur.com/oCcrmsN.png)
 
