@@ -57,8 +57,8 @@ class Polygon:
 
 # file columns traID, carID, occupy, time1, time2, longitude, latitude, speed, angle
 # separate occupied taxi trajectory and empty taxi trajectory
-# sort occupied taxi trajectory into occupy_file
-# sort empty taxi trajectory into empty_file
+# store occupied taxi trajectory into occupy_file
+# store empty taxi trajectory into empty_file
 def process_tra(file_name, occupy_file, empty_file):
     out_occupy = open(occupy_file,'w')
     out_empty = open(empty_file,'w')
