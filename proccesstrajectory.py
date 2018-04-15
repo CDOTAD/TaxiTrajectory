@@ -11,8 +11,6 @@ class Point:
         return 'Point({x},{y})'.format(x=self.lon,y=self.lat)
 
 
-
-
 class Polygon:
 
     def __init__(self,point_set):
@@ -110,7 +108,7 @@ def process_tra(file_name, occupy_file, empty_file):
             if taxiID not in taxi_occupy.keys():
                 taxi_occupy[taxiID] = occupy
 
-                taxi_trajectory[taxiID] = [line]
+                taxi_trajectory[taxiID] = [data]
 
             # occupy bit changing means an occupied trajectory or empty trajecotry is end and store these record
             if occupy != taxi_occupy[taxiID]:
@@ -123,9 +121,19 @@ def process_tra(file_name, occupy_file, empty_file):
 
                         for tra in taxi_trajectory[taxiID]:
 
-                            print(str(occupy_tra_num)+','+tra+'\n')
+                            tra_str = ""
 
-                            out_occupy.writelines(str(occupy_tra_num)+','+tra+'\n')
+                            tra[column['traID']] = str(occupy_tra_num)
+
+                            for item in tra:
+
+                                tra_str += item + ','
+
+                            tra_str[-1]='\n'
+
+                            print(tra_str)
+
+                            out_occupy.writelines(tra_str)
 
                         taxi_trajectory[taxiID]=[]
                         taxi_occupy[taxiID]=occupy
@@ -138,14 +146,26 @@ def process_tra(file_name, occupy_file, empty_file):
 
                         for tra in taxi_trajectory[taxiID]:
 
-                            print(str(empty_tra_num)+','+tra+'\n')
+                            tra_str = ""
 
-                            out_empty.writelines(str(empty_tra_num)+','+tra+'\n')
+                            tra[column['traID']] = str(occupy_tra_num)
+
+                            for item in tra:
+
+                                tra_str += item + ','
+
+                            tra_str[-1] ='\n'
+
+                            print(tra_str)
+
+                            out_empty.writelines(tra_str)
 
                         taxi_trajectory[taxiID]=[]
                         taxi_occupy[taxiID]=occupy
+            # the same occupy bit means the records are in the same trajectory
             else:
-                taxi_trajectory[taxiID].append(line)
+                taxi_trajectory[taxiID].append(data)
+                
     # there might be records left in the dict
     for taxiID, trajectory in taxi_trajectory.items():
 
@@ -156,18 +176,33 @@ def process_tra(file_name, occupy_file, empty_file):
                 occupy_tra_num += 1
 
                 for tra in trajectory:
-                    print(str(occupy_tra_num)+','+tra+'\n')
 
-                    out_occupy.writelines(str(occupy_tra_num)+','+tra+'\n')
+                    tra_str = ""
+                    for item in tra:
+
+                        tra_str += item+','
+
+                    tra_str[-1]='\n'
+                    print(tra_str)
+
+                    out_occupy.writelines(tra_str)
+
             # an empty record
             else:
 
                 empty_tra_num += 1
 
                 for tra in trajectory:
-                    print(str(empty_tra_num) + ',' + tra + '\n')
+                    tra_str = ""
+                    for item in tra:
 
-                    out_empty.writelines(str(empty_tra_num) + ',' + tra + '\n')
+                        tra_str += item + ','
+
+                    tra_str[-1] = '\n'
+
+                    print(tra_str)
+
+                    out_empty.writelines(tra_str)
 
     out_occupy.close()
     out_empty.close()
@@ -177,7 +212,7 @@ def process_tra(file_name, occupy_file, empty_file):
 
 # file columns traID, carID, occupy, time1, time2, longitude, latitude, speed, angle
 # clip the trajectory that contained by the given poly_bound
-def process_polyon_tra(file_name, out_file, poly_bound):
+def process_polygon_tra(file_name, out_file, poly_bound):
 
     out = open(out_file,'w')
     admin_poly = Polygon(poly_bound)
@@ -185,6 +220,8 @@ def process_polyon_tra(file_name, out_file, poly_bound):
     column_dict = dict()
 
     row = 0
+
+    tra_id_set = set()
 
     with open(file_name,'r') as in_file:
 
@@ -204,13 +241,17 @@ def process_polyon_tra(file_name, out_file, poly_bound):
                 continue
 
             tra_point = Point(float(lines[column_dict['longitude']]), float(lines[column_dict['latitude']]))
+            print(tra_point)
+
             if admin_poly.contain_point(tra_point):
 
                 out.writelines(line)
 
+                tra_id_set.add(lines[column_dict['traID']])
+
     out.close()
 
-    return
+    return len(tra_id_set)
 
 
 if __name__ == '__main__':
