@@ -129,7 +129,8 @@ def process_tra(file_name, occupy_file, empty_file):
 
                                 tra_str += item + ','
 
-                            tra_str[-1]='\n'
+                            tra_str = tra_str[:-1]
+                            tra_str += '\n'
 
                             print(tra_str)
 
@@ -154,7 +155,8 @@ def process_tra(file_name, occupy_file, empty_file):
 
                                 tra_str += item + ','
 
-                            tra_str[-1] ='\n'
+                            tra_str = tra_str[:-1]
+                            tra_str += '\n'
 
                             print(tra_str)
 
@@ -165,7 +167,7 @@ def process_tra(file_name, occupy_file, empty_file):
             # the same occupy bit means the records are in the same trajectory
             else:
                 taxi_trajectory[taxiID].append(data)
-                
+
     # there might be records left in the dict
     for taxiID, trajectory in taxi_trajectory.items():
 
@@ -178,11 +180,15 @@ def process_tra(file_name, occupy_file, empty_file):
                 for tra in trajectory:
 
                     tra_str = ""
+
+                    tra[column['traID']]=str(occupy_tra_num)
+
                     for item in tra:
 
                         tra_str += item+','
 
-                    tra_str[-1]='\n'
+                    tra_str = tra_str[:-1]
+                    tra_str += '\n'
                     print(tra_str)
 
                     out_occupy.writelines(tra_str)
@@ -194,11 +200,14 @@ def process_tra(file_name, occupy_file, empty_file):
 
                 for tra in trajectory:
                     tra_str = ""
+
+                    tra[column['traID']] = str(empty_tra_num)
                     for item in tra:
 
                         tra_str += item + ','
 
-                    tra_str[-1] = '\n'
+                    tra_str = tra_str[:-1]
+                    tra_str += '\n'
 
                     print(tra_str)
 
