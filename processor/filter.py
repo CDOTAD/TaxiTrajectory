@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from filterpy.gh import GHFilter
 from shapely.geometry import Point
 from shapely.geometry import LineString
 
@@ -24,7 +25,7 @@ def near_point_combine(trajectory):
 
     point_correct_list = []
 
-    print('point_lis',point_list)
+    #print('point_lis',point_list)
 
     while fix_bit is True:
 
@@ -56,7 +57,7 @@ def near_point_combine(trajectory):
 
             point_list = point_correct_list
             point_correct_list = []
-    print(point_list)
+    #print(point_list)
     if len(point_list) < 2:
         return LineString()
 
@@ -90,6 +91,7 @@ def trajectory_statis(trajectory):
 
     return LineString(point_list),mean,var,n
 """
+
 
 # fix the error points
 # input data type trajectory : shapely.geometry.LineString
@@ -134,7 +136,7 @@ def error_record_fix(trajectory, avg_dis=None, var_dis=None):
 
         print('error_list',error_list)
 
-        if len(error_list)==0:
+        if len(error_list) == 0:
             if avg_dis > 1000:
                 return None
 
@@ -207,6 +209,72 @@ def error_record_fix(trajectory, avg_dis=None, var_dis=None):
     #print('fix',str(line_correct))
 
     return line_correct
+
+
+# filt with filterpy.gh_filter
+# input trajectory, velocity, avg_dis[selective], var_dis[selective]
+def tra_gh_filter(trajectory, v, avg_dis=152.5781, var_dis=327.7119):
+
+    point_list=[]
+    for point in list(trajectory.coords):
+        point_list.append(Point(point))
+    point_num = len(point_list)
+
+    distance_list=[]
+    for i in range(point_num-1):
+        dis = point_list[i].distance(point_list[i + 1])
+
+        distance_list.append(dis)
+
+    error_list=[]
+    for i in range(len(distance_list)):
+        if distance_list[i] > avg_dis + 3*var_dis:
+
+            error_list.append(i)
+
+    error_point = []
+    if len(error_list) > 1:
+        for i in range(len(error_list) - 1):
+
+            error_dis_now = error_list[i]
+            error_dis_next = error_list[i + 1]
+
+            if error_dis_next == error_dis_now + 1:
+                error_index = error_dis_next
+                error_point.append(error_dis_next)
+    elif len(error_list) == 1:
+        if error_list[0] == point_num - 1:
+            error_index = point_num - 1
+            error_point.append(error_index)
+
+    x_0 = np.array([point_list[0].x, point_list[0].y])
+    dx_0 = np.array(v)
+
+    gh_f_tra = GHFilter(x=x_0, dx=dx_0, dt=10., g=.8, h=.2)
+    correct_point = [point_list[0]]
+    for i in range(1, len(point_list)):
+        if i in error_point:
+            gh_f_tra.g = 0
+            gh_f_tra.h = 0
+        else:
+            gh_f_tra.g = .8
+            gh_f_tra.h = .2
+        gh_f_tra.update(z=np.array([point_list[i].x,point_list[i].y]))
+
+        correct_point.append(gh_f_tra.x)
+
+    line_correct = LineString(correct_point)
+
+    return line_correct
+
+
+
+
+
+
+
+
+
 
 
 
